@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  containers:
+  - name: mysql
+    image: mysql:latest
+    ports:
+    - containerPort: 80
+    env:
+    - name: MYSQL_ROOT_PASSWORD 
+      value: ${PASSWORD}
+    - name: MYSQL_DATABASE 
+      value: ${DBNAME}
+      
+  # -- Using a secret --
+  # env:
+  # - name: MYSQL_ROOT_PASSWORD
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: my-secret
+  #       key: mysql-password
+  # - name: MYSQL_DATABASE
+  #   value: mydb
+  # ports:
+  #   - containerPort: 3306

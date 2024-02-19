@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginxservice
+spec:
+  type: LoadBalancer # loadbalancer for external, clusterIP for internal
+  ports:
+    - port: 80 # port for the service itself
+      targetPort: 80 # target of the container port
+      protocol: TCP
+  selector:
+    app: nginx # will attach this service to any pod with the label app: nginx
