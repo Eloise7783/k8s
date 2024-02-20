@@ -1,0 +1,26 @@
+apiVersion: apps/v1 # subgroup of api server - specific resources for deployments
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx # label deployment object itself (not really needed unless you want to delete based on label)
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: nginx # specify what pods are controlled by the deployment
+  strategy: 
+    rollingUpdate: # this is default, updates 1 pod at a time - other option is "recreate" - this destroys and rebuilds (downtime for a live app) - can get plugins for other types (like "canary")
+      maxSurge: 25% # how often we can go into our replicas
+      maxUnavailable: 25% # how much space can go down in a deployment
+  template:
+    metadata:
+      labels:
+        app: nginx # this label is assigned to each pod created from this template
+    spec:
+      containers:
+      - name: nginx # - declares a list
+        image: nginx:alpine
+
+# will keep spinning up pods even if you delete them - need to delete deployment if you want to remove all
+# still need to create service separately.
