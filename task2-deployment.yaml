@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service
+spec:
+  type: LoadBalancer 
+  selector:
+    app: mytriotaskflaskapp
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mytriotasksql
+spec:
+  type: ClusterIP
+  selector:
+    app: mytriotasksql
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+# create flask deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mytriotaskflaskapp
+  labels:
+    app: mytriotaskflaskapp
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: mytriotaskflaskapp
+  strategy: 
+    rollingUpdate: 
+      maxSurge: 25% 
+      maxUnavailable: 25% 
+  template:
+    metadata:
+      labels:
+        app: mytriotaskflaskapp
+    spec:
+      containers:
+      - name: mytriotaskflaskapp
+        image: chrisreeves1/mytriotaskflaskapp:2.0
+        ports:
+        - containerPort: 5000
+---
+# create mysql deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mytriotasksql
+  labels:
+    app: mytriotasksql
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: mytriotasksql
+  strategy: 
+    rollingUpdate: 
+      maxSurge: 25% 
+      maxUnavailable: 25% 
+  template:
+    metadata:
+      labels:
+        app: mytriotasksql
+    spec:
+      containers:
+      - name: mytriotasksql
+        image: chrisreeves1/mytriotasksql
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD 
+          value: password
+        - name: MYSQL_DATABASE 
+          value: flask-db
